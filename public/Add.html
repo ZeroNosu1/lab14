@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบแจ้งลืมลงเวลาปฏิบัติงาน</title>
+  <link rel="stylesheet" href="Add.html.css"> <!-- ใส่ไฟล์ CSS ของคุณที่นี่ -->
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">admin</div>
+      <h1>ยินดีต้อนรับ</h1>
+      <p>ระบบแจ้งลืมลงเวลาปฏิบัติงานของบุคลากร</p>
+    </header>
+
+    <div class="main-content">
+      <nav class="sidebar">
+        <ul>
+          <li><a href="Add.html">เพิ่มข้อมูล</a></li>
+          <li><a href="list.html">รายชื่อบุคลากร</a></li>
+          <li><a href="notifications.html">การแจ้งเตือน</a></li>
+          <li><a href="logout.html">ออกจากระบบ</a></li>
+        </ul>
+      </nav>
+
+      <section class="form-section">
+        <h2>ระบบแจ้งลืมลงเวลาปฏิบัติงานของบุคลากร</h2>
+        
+        <form id="user-form">
+          <!-- ชื่อ -->
+          <label for="name">ชื่อบุคลากร</label>
+          <input type="text" id="name" name="name" placeholder="ชื่อบุคลากร" required>
+          
+          <!-- วันที่เริ่มงาน -->
+          <label for="work_start_time">วันที่เริ่มงาน</label>
+          <input type="date" id="work_start_time" name="work_start_time" required>
+
+          <!-- ลาป่วย -->
+          <label for="sick_leave">จำนวนครั้งการลาป่วย</label>
+          <input type="number" id="sick_leave" name="sick_leave" value="0">
+
+          <!-- ลากิจ -->
+          <label for="personal_leave">จำนวนครั้งการลากิจ</label>
+          <input type="number" id="personal_leave" name="personal_leave" value="0">
+
+          <!-- ลาพักร้อน -->
+          <label for="vacation_leave">จำนวนครั้งการลาพักร้อน</label>
+          <input type="number" id="vacation_leave" name="vacation_leave" value="0">
+
+          <!-- ลาประเภทอื่นๆ -->
+          <label for="other_leave">จำนวนครั้งการลาประเภทอื่นๆ</label>
+          <input type="number" id="other_leave" name="other_leave" value="0">
+
+          <!-- ออกปฏิบัติงานนอกสถานที่ -->
+          <label for="out_of_area_work">จำนวนครั้งที่ออกปฏิบัติงานนอกสถานที่</label>
+          <input type="number" id="out_of_area_work" name="out_of_area_work" value="0">
+
+          <!-- คำอธิบายการไม่ลงเวลา -->
+          <label for="no_time_entry_explanation">คำอธิบายการไม่ลงเวลา</label>
+          <input type="text" id="no_time_entry_explanation" name="no_time_entry_explanation" placeholder="คำอธิบายการไม่ลงเวลา">
+
+          <!-- จำนวนวันทำงานทั้งหมด -->
+          <label for="total_work_days">จำนวนวันทำงานทั้งหมด</label>
+          <input type="number" id="total_work_days" name="total_work_days" value="0">
+
+          <!-- จำนวนครั้ง -->
+          <label for="number_of_times">จำนวนครั้งที่เกิดขึ้น</label>
+          <input type="number" id="number_of_times" name="number_of_times" value="0">
+
+          <!-- จำนวนครั้งที่มีคำอธิบาย -->
+          <label for="number_of_explanations">จำนวนครั้งที่มีคำอธิบาย</label>
+          <input type="number" id="number_of_explanations" name="number_of_explanations" value="0">
+
+          <!-- วันที่ไม่มีการลงเวลา -->
+          <label for="no_time_entry_dates">วันที่ไม่มีการลงเวลา (ในรูปแบบ JSON)</label>
+          <textarea id="no_time_entry_dates" name="no_time_entry_dates" placeholder="[]"></textarea>
+
+          <div class="button-group">
+            <button type="submit" class="btn save">บันทึก</button>
+            <button type="reset" class="btn cancel">ยกเลิก</button>
+          </div>
+        </form>
+      </section>
+
+      
+
+  <script>
+    // ฟังก์ชันการโหลดข้อมูลผู้ใช้
+    async function loadUsers() {
+      try {
+        const response = await fetch('/api/users');
+        if (!response.ok) throw new Error('Network response was not ok');
+        const users = await response.json();
+
+        // การแสดงข้อมูลผู้ใช้ในตาราง
+        const tbody = document.querySelector('#usersTable tbody');
+        tbody.innerHTML = ''; // ล้างข้อมูลเดิม
+
+        users.forEach(user => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${user.name}</td>
+            <td>${new Date(user.work_start_time).toLocaleDateString()}</td>
+            <td>${user.sick_leave}</td>
+            <td>${user.personal_leave}</td>
+            <td>${user.vacation_leave}</td>
+            <td>${user.other_leave}</td>
+            <td>${user.out_of_area_work}</td>
+            <td>${user.no_time_entry_explanation}</td>
+            <td>${user.total_work_days}</td>
+            <td>${user.number_of_times}</td>
+            <td>${user.number_of_explanations}</td>
+            <td>${JSON.parse(user.no_time_entry_dates).join(', ')}</td>
+            <td>
+              <button class="delete-btn" data-id="${user._id}">ลบ</button>
+            </td>
+          `;
+          tbody.appendChild(row);
+        });
+
+        // เพิ่ม Event Listener สำหรับปุ่มลบ
+        document.querySelectorAll('.delete-btn').forEach(button => {
+          button.addEventListener('click', function() {
+            const userId = this.getAttribute('data-id');
+            deleteUser(userId);
+          });
+        });
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      }
+    }
+
+    // ฟังก์ชันการลบผู้ใช้
+    async function deleteUser(userId) {
+      try {
+        const response = await fetch(`/api/user/${userId}`, { method: 'DELETE' });
+        if (!response.ok) throw new Error('Failed to delete user');
+        
+        // เรียกฟังก์ชัน loadUsers เพื่ออัปเดตข้อมูลหลังจากลบ
+        loadUsers();
+      } catch (error) {
+        console.error('Error deleting user:', error);
+      }
+    }
+
+    // ฟังก์ชันการตรวจสอบการยืนยันตัวตน
+    async function checkAuth() {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/auth/validate', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (response.status !== 200) {
+          window.location.href = 'Add.html';
+        }
+      } catch (error) {
+        console.error('Error checking auth:', error);
+        window.location.href = 'Add.html';
+      }
+    }
+
+    // เรียกใช้งานฟังก์ชันเมื่อ DOM โหลดเสร็จ
+    document.addEventListener('DOMContentLoaded', () => {
+      checkAuth();
+      loadUsers();
+    });
+  </script>
+</body>
+</html>

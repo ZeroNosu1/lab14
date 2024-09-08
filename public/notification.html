@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>การแจ้งเตือน</title>
+  <link rel="stylesheet" href="notification.html.css"> <!-- ใส่ไฟล์ CSS ของคุณที่นี่ -->
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">admin</div>
+      <h1>การแจ้งเตือน</h1>
+    </header>
+
+    <div class="main-content">
+      <nav class="sidebar">
+        <ul>
+          <li><a href="Add.html">เพิ่มข้อมูล</a></li>
+          <li><a href="list.html">รายชื่อบุคลากร</a></li>
+          <li><a href="notifications.html">การแจ้งเตือน</a></li>
+          <li><a href="logout.html">ออกจากระบบ</a></li>
+        </ul>
+      </nav>
+
+      <!-- ส่วนแสดงการแจ้งเตือน -->
+      <section class="notification-section">
+        <h2>การแจ้งเตือน</h2>
+        <ul id="notificationsList">
+          <!-- รายการการแจ้งเตือนจะถูกโหลดที่นี่ -->
+        </ul>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    // ฟังก์ชันการโหลดการแจ้งเตือน
+    async function loadNotifications() {
+      try {
+        const response = await fetch('/api/notifications');
+        if (!response.ok) throw new Error('Network response was not ok');
+        const notifications = await response.json();
+
+        // การแสดงรายการการแจ้งเตือน
+        const notificationsList = document.querySelector('#notificationsList');
+        notificationsList.innerHTML = ''; // ล้างข้อมูลเดิม
+
+        notifications.forEach(notification => {
+          const listItem = document.createElement('li');
+          listItem.textContent = notification.message; // แสดงข้อความการแจ้งเตือน
+          notificationsList.appendChild(listItem);
+        });
+      } catch (error) {
+        console.error('Error fetching notifications:', error);
+        const notificationsList = document.querySelector('#notificationsList');
+        notificationsList.innerHTML = '<li>เกิดข้อผิดพลาดในการโหลดข้อมูลการแจ้งเตือน</li>';
+      }
+    }
+
+    // ฟังก์ชันการตรวจสอบการยืนยันตัวตน
+    async function checkAuth() {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/auth/validate', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (response.status !== 200) {
+          window.location.href = 'notification.html'; // เปลี่ยนเส้นทางไปยังหน้าเข้าสู่ระบบสำหรับผู้ใช้
+        }
+      } catch (error) {
+        console.error('Error checking auth:', error);
+        window.location.href = 'notification.html'; // เปลี่ยนเส้นทางไปยังหน้าเข้าสู่ระบบสำหรับผู้ใช้
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      checkAuth();
+      loadNotifications();
+    });
+  </script>
+</body>
+</html>
