@@ -62,7 +62,7 @@
     // ฟังก์ชันการตรวจสอบการยืนยันตัวตน
     async function checkAuth() {
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('access-token');
         const response = await fetch('/api/auth/validate', {
           method: 'GET',
           headers: {

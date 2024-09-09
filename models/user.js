@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema({
     total_work_days: { type: Number, default: 0 },
     number_of_times: { type: Number, default: 0 }, // แก้คำจาก informationlt เป็น default
     number_of_explanations: { type: Number, default: 0 },
-    no_time_entry_dates: { type: [Date], default: [] } // เปลี่ยนเป็น Array ของ Date
+    no_time_entry_dates: [{ type: String }] // เปลี่ยนเป็น Array ของ Date
 });
 
 // Export the model with the correct schema

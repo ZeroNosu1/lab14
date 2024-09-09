@@ -35,7 +35,11 @@ app.get('/login', (req, res) => {
 
 // กำหนด route สำหรับ user
 const userRoutes = require('./routes/userlogin');
-app.use('/api/', userRoutes);
+app.use('/api', userRoutes);
+
+const user = require('./routes/user');
+app.use('/auth', user);
+
 
 // เริ่มต้นเซิร์ฟเวอร์
 const PORT = process.env.PORT || 3000;

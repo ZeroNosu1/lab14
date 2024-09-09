@@ -4,26 +4,55 @@ const User = require('../models/user'); // Import User model
 const parseUserData = (data) => {
     const parsedData = { ...data };
 
+    // Process work_start_time
     if (data.work_start_time) {
         const date = new Date(data.work_start_time);
         if (!isNaN(date.getTime())) {
-            parsedData.work_start_time = date;
+            parsedData.work_start_time = date.toISOString(); // Convert to ISO string
         } else {
             throw new Error('Invalid date format for work_start_time');
         }
     }
+
+    // Process no_time_entry_dates
     if (data.no_time_entry_dates) {
         try {
-            parsedData.no_time_entry_dates = JSON.stringify(data.no_time_entry_dates);
+            if (typeof data.no_time_entry_dates === 'string') {
+                // If it's a string, try parsing it as JSON
+                const parsedArray = JSON.parse(data.no_time_entry_dates);
+                if (Array.isArray(parsedArray)) {
+                    parsedData.no_time_entry_dates = parsedArray.map(dateStr => {
+                        const date = new Date(dateStr);
+                        if (!isNaN(date.getTime())) {
+                            return date.toISOString();
+                        } else {
+                            throw new Error(`Invalid date format in no_time_entry_dates: ${dateStr}`);
+                        }
+                    });
+                } else {
+                    throw new Error('no_time_entry_dates JSON string does not represent an array');
+                }
+            } else if (Array.isArray(data.no_time_entry_dates)) {
+                // If it's already an array, validate each item
+                parsedData.no_time_entry_dates = data.no_time_entry_dates.map(dateStr => {
+                    const date = new Date(dateStr);
+                    if (!isNaN(date.getTime())) {
+                        return date.toISOString();
+                    } else {
+                        throw new Error(`Invalid date format in no_time_entry_dates: ${dateStr}`);
+                    }
+                });
+            } else {
+                throw new Error('no_time_entry_dates is neither a valid JSON string nor an array');
+            }
         } catch (e) {
-            throw new Error('Invalid format for no_time_entry_dates');
+            throw new Error(`Invalid format for no_time_entry_dates: ${e.message}`);
         }
     }
 
-    // Add more validation logic here if needed
-
     return parsedData;
 };
+
 
 // Get all users
 exports.getUsers = async (req, res) => {

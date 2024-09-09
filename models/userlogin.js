@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 // Define the schema correctly
 const userloginSchema = new mongoose.Schema({
-    user_name: { type: String, required: true, unique: true }, // เพิ่ม unique: true เพื่อป้องกันการซ้ำ
+    user_name: { type: String, required: true}, // เพิ่ม unique: true เพื่อป้องกันการซ้ำ
     password: { type: String, required: true },
 }, 
 { timestamps: true, versionKey: false });

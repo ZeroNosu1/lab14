@@ -1,17 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <link rel="stylesheet" href="login.html.css"> <!-- ตรวจสอบชื่อไฟล์ CSS ของคุณ -->
 </head>
+
 <body>
     <div class="login-container">
         <h1>Login</h1>
         <form id="login-form">
             <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required>
+            <input type="text" id="user_name" name="username" required>
             <br>
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" required>
@@ -25,7 +27,7 @@
         document.getElementById('login-form').addEventListener('submit', async function (event) {
             event.preventDefault();
 
-            const user_name = document.getElementById('username').value;
+            const username = document.getElementById('user_name').value;
             const password = document.getElementById('password').value;
 
             try {
@@ -34,18 +36,21 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ user_name, password })
+                    body: JSON.stringify({
+                        user_name: username,
+                        password: password
+                    })
                 });
 
                 const data = await response.json();
-                
-                if (!response.ok) {
-                    document.getElementById('loginError').textContent = data.message || 'An unexpected error occurred.';
-                    return;
-                }
 
-                if (data.success) {
-                    window.location.href = './Add.html'; // เปลี่ยนเส้นทางไปยังหน้า adminpage
+                if (response.ok) {
+                    // เก็บ accessToken และ refreshToken ใน localStorage
+                    // localStorage.setItem('accessToken', data.accessToken);
+                    // localStorage.setItem('refreshToken', data.refreshToken);
+                    localStorage.setItem('access-token', data.accessToken);
+                    // เปลี่ยนเส้นทางไปยังหน้า Add.html
+                    window.location.href = './Add.html';
                 } else {
                     document.getElementById('loginError').textContent = data.message || 'An unexpected error occurred.';
                 }
@@ -56,4 +61,5 @@
         });
     </script>
 </body>
+
 </html>

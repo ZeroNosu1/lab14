@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ระบบแจ้งลืมลงเวลาปฏิบัติงาน</title>
   <link rel="stylesheet" href="Add.html.css"> <!-- ใส่ไฟล์ CSS ของคุณที่นี่ -->
 </head>
+
 <body>
   <div class="container">
     <header>
@@ -26,12 +28,12 @@
 
       <section class="form-section">
         <h2>ระบบแจ้งลืมลงเวลาปฏิบัติงานของบุคลากร</h2>
-        
+
         <form id="user-form">
           <!-- ชื่อ -->
           <label for="name">ชื่อบุคลากร</label>
           <input type="text" id="name" name="name" placeholder="ชื่อบุคลากร" required>
-          
+
           <!-- วันที่เริ่มงาน -->
           <label for="work_start_time">วันที่เริ่มงาน</label>
           <input type="date" id="work_start_time" name="work_start_time" required>
@@ -58,7 +60,8 @@
 
           <!-- คำอธิบายการไม่ลงเวลา -->
           <label for="no_time_entry_explanation">คำอธิบายการไม่ลงเวลา</label>
-          <input type="text" id="no_time_entry_explanation" name="no_time_entry_explanation" placeholder="คำอธิบายการไม่ลงเวลา">
+          <input type="text" id="no_time_entry_explanation" name="no_time_entry_explanation"
+            placeholder="คำอธิบายการไม่ลงเวลา">
 
           <!-- จำนวนวันทำงานทั้งหมด -->
           <label for="total_work_days">จำนวนวันทำงานทั้งหมด</label>
@@ -83,13 +86,21 @@
         </form>
       </section>
 
-      
+
 
   <script>
     // ฟังก์ชันการโหลดข้อมูลผู้ใช้
     async function loadUsers() {
       try {
-        const response = await fetch('/api/users');
+        const token = localStorage.getItem('access-token'); // ดึง accessToken จาก localStorage
+        const response = await fetch('/auth/users', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` // ส่ง accessToken ไปใน header
+          }
+        });
+
         if (!response.ok) throw new Error('Network response was not ok');
         const users = await response.json();
 
@@ -99,6 +110,8 @@
 
         users.forEach(user => {
           const row = document.createElement('tr');
+          const no_time_entry_dates = data.no_time_entry_dates.map(dateStr => new Date(dateStr));
+
           row.innerHTML = `
             <td>${user.name}</td>
             <td>${new Date(user.work_start_time).toLocaleDateString()}</td>
@@ -107,11 +120,11 @@
             <td>${user.vacation_leave}</td>
             <td>${user.other_leave}</td>
             <td>${user.out_of_area_work}</td>
-            <td>${user.no_time_entry_explanation}</td>
+            <td>${user.no_time_entry_explanation || ''}</td>
             <td>${user.total_work_days}</td>
             <td>${user.number_of_times}</td>
             <td>${user.number_of_explanations}</td>
-            <td>${JSON.parse(user.no_time_entry_dates).join(', ')}</td>
+            <td>${no_time_entry_dates}</td>
             <td>
               <button class="delete-btn" data-id="${user._id}">ลบ</button>
             </td>
@@ -121,7 +134,7 @@
 
         // เพิ่ม Event Listener สำหรับปุ่มลบ
         document.querySelectorAll('.delete-btn').forEach(button => {
-          button.addEventListener('click', function() {
+          button.addEventListener('click', function () {
             const userId = this.getAttribute('data-id');
             deleteUser(userId);
           });
@@ -134,9 +147,16 @@
     // ฟังก์ชันการลบผู้ใช้
     async function deleteUser(userId) {
       try {
-        const response = await fetch(`/api/user/${userId}`, { method: 'DELETE' });
+        const token = localStorage.getItem('access-token'); // ดึง accessToken จาก localStorage
+        const response = await fetch(`/api/user/${userId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` // ส่ง accessToken ไปใน header
+          }
+        });
         if (!response.ok) throw new Error('Failed to delete user');
-        
+
         // เรียกฟังก์ชัน loadUsers เพื่ออัปเดตข้อมูลหลังจากลบ
         loadUsers();
       } catch (error) {
@@ -146,19 +166,29 @@
 
     // ฟังก์ชันการตรวจสอบการยืนยันตัวตน
     async function checkAuth() {
+      const token = localStorage.getItem('access-token'); // ดึง accessToken จาก localStorage
+
+      if (!token) {
+        // ถ้าไม่มี accessToken ให้เปลี่ยนเส้นทางไปที่หน้า login.html
+        window.location.href = 'login.html';
+        return;
+      }
+
       try {
-        const response = await fetch('/api/user', {
+        const response = await fetch('/auth/users', {
           method: 'GET',
           headers: {
-            'Authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${token}` // ส่ง accessToken ไปใน header
           }
         });
-        if (response.status !== 200) {
-          window.location.href = 'Add.html';
+
+        if (response.status === 401 || response.status === 403) {
+          // ถ้า accessToken ไม่ถูกต้องให้เปลี่ยนเส้นทางไปที่หน้า login.html
+          window.location.href = 'login.html';
         }
       } catch (error) {
         console.error('Error checking auth:', error);
-        window.location.href = 'Add.html';
+        // window.location.href = 'login.html'; // เปลี่ยนเส้นทางไปที่หน้า login.html ในกรณีที่เกิดข้อผิดพลาด
       }
     }
 
@@ -167,6 +197,34 @@
       checkAuth();
       loadUsers();
     });
+
+    document.getElementById('user-form').addEventListener('submit', async function (event) {
+      event.preventDefault();
+
+      const formData = new FormData(this);
+      const data = Object.fromEntries(formData.entries());
+      console.log(data);
+      
+
+      try {
+        const token = localStorage.getItem('access-token'); // ดึง accessToken จาก localStorage
+        const response = await fetch('/auth/postuser', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` // ส่ง accessToken ไปใน header
+          },
+          body: JSON.stringify(data)
+        });
+
+        if (!response.ok) throw new Error('Failed to add user');
+        document.getElementById('user-form').reset();
+        loadUsers(); // เรียกฟังก์ชัน loadUsers เพื่ออัปเดตข้อมูล
+      } catch (error) {
+        console.error('Error adding user:', error);
+      }
+    });
   </script>
 </body>
+
 </html>
