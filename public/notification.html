@@ -18,42 +18,44 @@
         <ul>
           <li><a href="Add.html">เพิ่มข้อมูล</a></li>
           <li><a href="list.html">รายชื่อบุคลากร</a></li>
-          <li><a href="notifications.html">การแจ้งเตือน</a></li>
+          <li><a href="notification.html">การแจ้งเตือน</a></li>
           <li><a href="logout.html">ออกจากระบบ</a></li>
         </ul>
       </nav>
 
+      <section class="form-section">
       <!-- ส่วนแสดงการแจ้งเตือน -->
       <section class="notification-section">
         <h2>การแจ้งเตือน</h2>
-        <ul id="notificationsList">
+        <ul id="notificationList">
           <!-- รายการการแจ้งเตือนจะถูกโหลดที่นี่ -->
         </ul>
       </section>
     </div>
   </div>
+</section>
 
   <script>
     // ฟังก์ชันการโหลดการแจ้งเตือน
-    async function loadNotifications() {
+    async function loadNotification() {
       try {
-        const response = await fetch('/api/notifications');
+        const response = await fetch('/api/notification');
         if (!response.ok) throw new Error('Network response was not ok');
-        const notifications = await response.json();
+        const notification = await response.json();
 
         // การแสดงรายการการแจ้งเตือน
-        const notificationsList = document.querySelector('#notificationsList');
-        notificationsList.innerHTML = ''; // ล้างข้อมูลเดิม
+        const notificationList = document.querySelector('#notificationList');
+        notificationList.innerHTML = ''; // ล้างข้อมูลเดิม
 
-        notifications.forEach(notification => {
+        notification.forEach(notification => {
           const listItem = document.createElement('li');
           listItem.textContent = notification.message; // แสดงข้อความการแจ้งเตือน
-          notificationsList.appendChild(listItem);
+          notificationList.appendChild(listItem);
         });
       } catch (error) {
-        console.error('Error fetching notifications:', error);
-        const notificationsList = document.querySelector('#notificationsList');
-        notificationsList.innerHTML = '<li>เกิดข้อผิดพลาดในการโหลดข้อมูลการแจ้งเตือน</li>';
+        console.error('Error fetching notification:', error);
+        const notificationList = document.querySelector('#notificationList');
+        notificationList.innerHTML = '<li>เกิดข้อผิดพลาดในการโหลดข้อมูลการแจ้งเตือน</li>';
       }
     }
 
@@ -78,7 +80,7 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       checkAuth();
-      loadNotifications();
+      loadNotification();
     });
   </script>
 </body>

@@ -19,7 +19,7 @@
         <ul>
           <li><a href="Add.html">เพิ่มข้อมูล</a></li>
           <li><a href="list.html">รายชื่อบุคลากร</a></li>
-          <li><a href="notifications.html">การแจ้งเตือน</a></li>
+          <li><a href="notification.html">การแจ้งเตือน</a></li>
           <li><a href="logout.html">ออกจากระบบ</a></li>
         </ul>
       </nav>
@@ -147,8 +147,7 @@
     // ฟังก์ชันการตรวจสอบการยืนยันตัวตน
     async function checkAuth() {
       try {
-        const token = localStorage.getItem('token');
-        const response = await fetch('/api/auth/validate', {
+        const response = await fetch('/api/user', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`

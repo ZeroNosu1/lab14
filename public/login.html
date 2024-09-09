@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <link rel="stylesheet" href="login.html.css"> <!-- ลิงก์ไปยังไฟล์ CSS ของคุณ -->
+    <link rel="stylesheet" href="login.html.css"> <!-- ตรวจสอบชื่อไฟล์ CSS ของคุณ -->
 </head>
 <body>
     <div class="login-container">
@@ -25,28 +25,26 @@
         document.getElementById('login-form').addEventListener('submit', async function (event) {
             event.preventDefault();
 
-            const username = document.getElementById('username').value;
+            const user_name = document.getElementById('username').value;
             const password = document.getElementById('password').value;
 
             try {
-                const response = await fetch('/api/auth/login', {
+                const response = await fetch('/api/login', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ username, password })
+                    body: JSON.stringify({ user_name, password })
                 });
 
+                const data = await response.json();
+                
                 if (!response.ok) {
-                    const data = await response.json();
                     document.getElementById('loginError').textContent = data.message || 'An unexpected error occurred.';
                     return;
                 }
 
-                // การตอบสนองปกติ
-                const data = await response.json();
                 if (data.success) {
-                    // แสดงข้อความการเข้าสู่ระบบสำเร็จหรือเปลี่ยนเส้นทางไปยังหน้าอื่น ๆ
                     window.location.href = './Add.html'; // เปลี่ยนเส้นทางไปยังหน้า adminpage
                 } else {
                     document.getElementById('loginError').textContent = data.message || 'An unexpected error occurred.';

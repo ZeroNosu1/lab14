@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>รายชื่อบุคลากร</title>
   <link rel="stylesheet" href="list.html.css"> <!-- ใส่ไฟล์ CSS ของคุณที่นี่ -->
 </head>
+
 <body>
   <div class="container">
     <header>
@@ -16,41 +18,43 @@
     <div class="main-content">
       <nav class="sidebar">
         <ul>
-            <li><a href="Add.html">เพิ่มข้อมูล</a></li>
-            <li><a href="list.html">รายชื่อบุคลากร</a></li>
-            <li><a href="notifications.html">การแจ้งเตือน</a></li>
-            <li><a href="logout.html">ออกจากระบบ</a></li>
+          <li><a href="Add.html">เพิ่มข้อมูล</a></li>
+          <li><a href="list.html">รายชื่อบุคลากร</a></li>
+          <li><a href="notification.html">การแจ้งเตือน</a></li>
+          <li><a href="logout.html">ออกจากระบบ</a></li>
         </ul>
       </nav>
 
-      <!-- ตารางแสดงข้อมูลผู้ใช้ -->
-      <section class="table-section">
-        <h2>รายชื่อบุคลากร</h2>
-        <table id="usersTable">
-          <thead>
-            <tr>
-              <th>ชื่อบุคลากร</th>
-              <th>วันที่เริ่มงาน</th>
-              <th>จำนวนครั้งการลาป่วย</th>
-              <th>จำนวนครั้งการลากิจ</th>
-              <th>จำนวนครั้งการลาพักร้อน</th>
-              <th>จำนวนครั้งการลาประเภทอื่นๆ</th>
-              <th>จำนวนครั้งที่ออกปฏิบัติงานนอกสถานที่</th>
-              <th>คำอธิบายการไม่ลงเวลา</th>
-              <th>จำนวนวันทำงานทั้งหมด</th>
-              <th>จำนวนครั้งที่เกิดขึ้น</th>
-              <th>จำนวนครั้งที่มีคำอธิบาย</th>
-              <th>วันที่ไม่มีการลงเวลา</th>
-              <th>การกระทำ</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- ข้อมูลผู้ใช้จะถูกโหลดที่นี่ -->
-          </tbody>
-        </table>
-      </section>
+      <section class="form-section">
+        <!-- ตารางแสดงข้อมูลผู้ใช้ -->
+        <section class="table-section">
+          <h2>รายชื่อบุคลากร</h2>
+          <table id="usersTable">
+            <thead>
+              <tr>
+                <th>ชื่อบุคลากร</th>
+                <th>วันที่เริ่มงาน</th>
+                <th>จำนวนครั้งการลาป่วย</th>
+                <th>จำนวนครั้งการลากิจ</th>
+                <th>จำนวนครั้งการลาพักร้อน</th>
+                <th>จำนวนครั้งการลาประเภทอื่นๆ</th>
+                <th>จำนวนครั้งที่ออกปฏิบัติงานนอกสถานที่</th>
+                <th>คำอธิบายการไม่ลงเวลา</th>
+                <th>จำนวนวันทำงานทั้งหมด</th>
+                <th>จำนวนครั้งที่เกิดขึ้น</th>
+                <th>จำนวนครั้งที่มีคำอธิบาย</th>
+                <th>วันที่ไม่มีการลงเวลา</th>
+                <th>การกระทำ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- ข้อมูลผู้ใช้จะถูกโหลดที่นี่ -->
+            </tbody>
+          </table>
+        </section>
     </div>
   </div>
+  </section>
 
   <script>
     // ฟังก์ชันการโหลดข้อมูลผู้ใช้
@@ -89,7 +93,7 @@
         // เพิ่ม Event Listener สำหรับปุ่มลบ
         const deleteButtons = document.querySelectorAll('.delete-btn');
         deleteButtons.forEach(button => {
-          button.addEventListener('click', function() {
+          button.addEventListener('click', function () {
             const userId = this.getAttribute('data-id');
             deleteUser(userId);
           });
@@ -104,7 +108,7 @@
       try {
         const response = await fetch(`/api/user/${userId}`, { method: 'DELETE' });
         if (!response.ok) throw new Error('Failed to delete user');
-        
+
         // เรียกฟังก์ชัน loadUsers เพื่ออัปเดตข้อมูลหลังจากลบ
         loadUsers();
       } catch (error) {
@@ -118,4 +122,5 @@
     });
   </script>
 </body>
+
 </html>

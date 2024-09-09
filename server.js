@@ -1,43 +1,35 @@
 const express = require('express');
-const app = express();
-const port = 3000;
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
 
+// โหลด environment variables จากไฟล์ .env
+dotenv.config();
+
+const app = express();
+
+// ใช้ middleware เพื่อจัดการ JSON payload
 app.use(express.json());
 
-// Mock data
-const users = [
-  { _id: '1', name: 'John Doe', work_start_time: '2024-01-01', sick_leave: 1, personal_leave: 2, vacation_leave: 3, other_leave: 0, out_of_area_work: 1, no_time_entry_explanation: '', total_work_days: 20, number_of_times: 5, number_of_explanations: 2, no_time_entry_dates: '["2024-01-05"]' }
-];
+// ฟังก์ชันสำหรับเชื่อมต่อกับ MongoDB
+const connectDB = async () => {
+    try {
+        await mongoose.connect(process.env.MONGO_DB_URI); // เปลี่ยนเป็น MONGO_DB_URI
+        console.log("Database connected successfully");
+    } catch (err) {
+        console.error('Database connection error:', err.message);
+        process.exit(1); // หยุดการทำงานของเซิร์ฟเวอร์ถ้าเชื่อมต่อ DB ไม่ได้
+    }
+};
 
-// Endpoints
-app.get('/api/users', (req, res) => {
-  res.json(users);
-});
+// เรียกฟังก์ชันเชื่อมต่อฐานข้อมูล
+connectDB();
 
-app.delete('/api/user/:id', (req, res) => {
-  const { id } = req.params;
-  const index = users.findIndex(user => user._id === id);
-  if (index !== -1) {
-    users.splice(index, 1);
-    res.status(200).send('User deleted');
-  } else {
-    res.status(404).send('User not found');
-  }
-});
+// กำหนด route สำหรับ user
+const userRoutes = require('./routes/user');
+app.use('/api/', userRoutes);
 
-app.get('/api/auth/validate', (req, res) => {
-  // Mock validation
-  const token = req.headers['authorization'];
-  if (token === 'Bearer valid_token') {
-    res.status(200).send('Token valid');
-  } else {
-    res.status(401).send('Unauthorized');
-  }
-});
-
-// Serve static files
-app.use(express.static('public'));
-
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+// เริ่มต้นเซิร์ฟเวอร์
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });
